@@ -1,11 +1,37 @@
+/* 🌌 Main Container */
 .analyzer-container {
   max-width: 900px;
   margin: auto;
   padding: 2rem;
-  background-color: #fefefe;
+  background: #1b1b1f;
+  color: #f5f5f5;
+  font-family: 'Segoe UI', sans-serif;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(230, 57, 70, 0.3);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* ✨ Fade-in Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🌁 Body Background */
+body {
+  margin: 0;
+  background: linear-gradient(to bottom, #121215, #1c1c24, #23232d);
   font-family: 'Segoe UI', sans-serif;
 }
 
+/* 🧭 Header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -13,36 +39,51 @@
 }
 
 .heading {
-  font-size: 2rem;
-  color: #2c3e50;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #e63946;
+  /* Crimson Red */
+  letter-spacing: 0.5px;
 }
 
+/* 🎯 Stock Selector */
 .selector-section {
   margin: 1.5rem 0;
 }
 
+.selector-section label {
+  font-weight: bold;
+  color: #f0f0f0;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* 🔍 Analyze Button */
 .analyze-btn {
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 1rem;
-  background-color: #007bff;
-  color: white;
+  background-color: #e63946;
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   display: block;
-  margin: 1rem auto;
-  transition: background-color 0.3s ease;
+  margin: 1.5rem auto;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-weight: 600;
 }
 
 .analyze-btn:hover {
-  background-color: #0056b3;
+  background-color: #c72c3b;
+  transform: scale(1.03);
 }
 
+/* ❌ End Analysis Button */
 .end-btn {
-  background-color: #dc3545;
+  background-color: #912f3c;
   color: white;
   padding: 0.5rem 1rem;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -50,25 +91,26 @@
 }
 
 .end-btn:hover {
-  background-color: #b52a34;
+  background-color: #e63946;
 }
 
+/* 📰 News Heading */
 .news-heading {
   margin-top: 2rem;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   text-align: center;
+  color: #ffb3b3;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  color: #333;
 }
 
 .spinner {
   width: 18px;
   height: 18px;
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #000;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #e63946;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -79,13 +121,15 @@
   }
 }
 
+/* ⏳ Loader */
 .loader {
   margin-top: 1rem;
   font-style: italic;
   text-align: center;
-  color: #555;
+  color: #e63946;
 }
 
+/* 📦 News Cards Container */
 .news-blocks {
   display: flex;
   flex-direction: column;
@@ -93,13 +137,13 @@
   margin-top: 2rem;
 }
 
-/* Main news card container */
+/* 📰 News Card */
 .news-card {
-  background-color: #fff;
-  padding: 1.5rem 1.75rem;
+  background-color: #2a2a32;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-left: 8px solid #ccc;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  border-left: 6px solid #aa6060;
   transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
@@ -107,77 +151,76 @@
 }
 
 .news-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-3px);
 }
 
-/* Border colors for sentiment */
+/* 🎯 Sentiment Border Colors */
 .news-card.positive {
-  border-left-color: #4caf50;
+  border-left-color: #2ecc71;
 }
 
 .news-card.negative {
-  border-left-color: #f44336;
+  border-left-color: #e63946;
 }
 
 .news-card.neutral {
-  border-left-color: #ffc107;
+  border-left-color: #f1c40f;
 }
 
-/* Headline styling */
+/* 📰 Headline */
 .news-card h3 {
   font-size: 1.4rem;
   font-weight: 700;
+  color: #ffffff;
   margin-bottom: 0.4rem;
-  color: #222;
   line-height: 1.3;
 }
 
-/* Summary paragraph: longer, trader-focused */
+/* 📋 Summary */
 .news-summary {
   font-size: 1rem;
-  color: #444;
+  color: #e0e0e0;
   line-height: 1.5;
-  margin-bottom: 0.8rem;
   white-space: pre-line;
-  /* respects line breaks if needed */
 }
 
-/* Info grid for impact, direction, time, source */
+/* 💡 Trader Advice */
+.trader-advice {
+  color: #ffcccc;
+  font-style: italic;
+}
+
+/* 🧾 Info Grid */
 .news-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.8rem 1.2rem;
+  gap: 0.8rem 1rem;
   font-size: 0.9rem;
-  color: #555;
   font-weight: 600;
+  color: #fafafa;
 }
 
-/* Labels inside the info grid */
 .news-info-grid div {
-  background-color: #f5f7fa;
+  background-color: #3c3c48;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
 
-/* Icons can be added via ::before if you want later */
-/* For now we use emojis in JSX */
-
-/* News meta (time and source) in smaller text */
+/* 📱 Responsive Meta */
 .news-meta {
   margin-top: 1rem;
   font-size: 0.85rem;
   display: flex;
   justify-content: flex-end;
   gap: 1.5rem;
-  color: #777;
+  color: #999;
   font-style: italic;
 }
 
-/* Optional: Make news-meta mobile friendly */
 @media (max-width: 480px) {
   .news-meta {
     flex-direction: column;
