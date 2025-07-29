@@ -39,7 +39,7 @@ const StockNewsAnalyzer = () => {
     wsRef.current.onmessage = (event) => {
       console.log("📥 Message received from backend:", event.data);
       const news = JSON.parse(event.data);
-      setNewsSummaries((prev) => [news, ...prev]);
+      setNewsSummaries((prev) => [news.result, ...prev]); // ✅ FIXED HERE
     };
 
     wsRef.current.onerror = (error) => {
@@ -68,7 +68,11 @@ const StockNewsAnalyzer = () => {
       sentiment: 'neutral',
       source: 'System',
       time: new Date().toISOString(),
-      traderAdvice: 'Please wait while the backend processes news for you.',
+      traderAdvice: {
+        ifInPosition: 'Please wait...',
+        ifNotInPosition: 'Please wait...',
+        ifNotRelevant: 'Please wait...'
+      },
     };
 
     setNewsSummaries([initialDemoNews]);
@@ -140,9 +144,14 @@ const StockNewsAnalyzer = () => {
           <div key={idx} className={`news-card ${news.sentiment}`}>
             <h3>{news.headline}</h3>
             <p className="news-summary">{news.summary}</p>
-            <p className="trader-advice">
-              <strong>💡 Trader Advice:</strong> {news.traderAdvice}
-            </p>
+            <div className="trader-advice">
+              <strong>💡 Trader Advice:</strong>
+              <ul>
+                <li><b>If in position:</b> {news.traderAdvice?.ifInPosition}</li>
+                <li><b>If not in position:</b> {news.traderAdvice?.ifNotInPosition}</li>
+                <li><b>Not relevant:</b> {news.traderAdvice?.ifNotRelevant}</li>
+              </ul>
+            </div>
             <div className="news-info-grid">
               <div>📌 Impact: {news.impact}</div>
               <div>📈 Direction: {news.direction}</div>
