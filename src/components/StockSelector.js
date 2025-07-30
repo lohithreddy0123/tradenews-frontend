@@ -98,127 +98,132 @@ const StockNewsAnalyzer = () => {
   }, []);
 
   return (
-    <div className="analyzer-container">
-      <div className="header">
-        <h1 className="heading">📊 AI News Analyzer</h1>
-        {loading && (
-          <button className="end-btn" onClick={handleEndAnalysis}>
-            ❌ End Analysis
+    <div class="center-wrapper">
+      <div className="analyzer-container">
+        <div className="header">
+          <h1 className="heading">
+            <span className="emoji">📊</span> AI News Analyzer
+          </h1>
+          {loading && (
+            <button className="end-btn" onClick={handleEndAnalysis}>
+              ❌ End Analysis
+            </button>
+          )}
+        </div>
+
+        <div className="selector-section">
+          <label>Select Stock/Crypto/Index:</label>
+          <Select
+            options={[
+              { label: 'Stocks', options: stockOptions.stocks },
+              { label: 'Crypto', options: stockOptions.crypto },
+              { label: 'Indices', options: stockOptions.indices },
+            ]}
+            value={selectedStock}
+            onChange={setSelectedStock}
+            placeholder="Search and select..."
+            isDisabled={loading}
+            styles={{
+              control: (base, state) => ({
+                ...base,
+                backgroundColor: '#1e1e1e',
+                borderColor: state.isFocused ? '#ff4d4d' : '#333',
+                boxShadow: state.isFocused ? '0 0 0 1px #ff4d4d' : 'none',
+                color: '#fff',
+              }),
+              singleValue: (base) => ({
+                ...base,
+                color: '#fff',
+              }),
+              menu: (base) => ({
+                ...base,
+                backgroundColor: '#2a2a2a',
+                color: '#fff',
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isFocused ? '#ff4d4d' : '#2a2a2a',
+                color: state.isFocused ? '#fff' : '#f0f0f0',
+                cursor: 'pointer',
+              }),
+              input: (base) => ({
+                ...base,
+                color: '#fff',
+              }),
+              placeholder: (base) => ({
+                ...base,
+                color: '#999',
+              }),
+              dropdownIndicator: (base) => ({
+                ...base,
+                color: '#ff4d4d',
+              }),
+            }}
+          />
+
+        </div>
+
+        {selectedStock && !loading && (
+          <button className="analyze-btn" onClick={handleAnalyze}>
+            🔍 Analyze
           </button>
         )}
-      </div>
 
-      <div className="selector-section">
-        <label>Select Stock/Crypto/Index:</label>
-        <Select
-          options={[
-            { label: 'Stocks', options: stockOptions.stocks },
-            { label: 'Crypto', options: stockOptions.crypto },
-            { label: 'Indices', options: stockOptions.indices },
-          ]}
-          value={selectedStock}
-          onChange={setSelectedStock}
-          placeholder="Search and select..."
-          isDisabled={loading}
-          styles={{
-            control: (base, state) => ({
-              ...base,
-              backgroundColor: '#1e1e1e',
-              borderColor: state.isFocused ? '#ff4d4d' : '#333',
-              boxShadow: state.isFocused ? '0 0 0 1px #ff4d4d' : 'none',
-              color: '#fff',
-            }),
-            singleValue: (base) => ({
-              ...base,
-              color: '#fff',
-            }),
-            menu: (base) => ({
-              ...base,
-              backgroundColor: '#2a2a2a',
-              color: '#fff',
-            }),
-            option: (base, state) => ({
-              ...base,
-              backgroundColor: state.isFocused ? '#ff4d4d' : '#2a2a2a',
-              color: state.isFocused ? '#fff' : '#f0f0f0',
-              cursor: 'pointer',
-            }),
-            input: (base) => ({
-              ...base,
-              color: '#fff',
-            }),
-            placeholder: (base) => ({
-              ...base,
-              color: '#999',
-            }),
-            dropdownIndicator: (base) => ({
-              ...base,
-              color: '#ff4d4d',
-            }),
-          }}
-        />
+        {selectedStock && (
+          <h2 className="news-heading">
+            📰 Analyzing News for: <span>{selectedStock.label}</span>
+            {loading && <span className="spinner" />}
+          </h2>
+        )}
 
-      </div>
+        {loading && <div className="loader">⏳ Live analysis in progress...</div>}
 
-      {selectedStock && !loading && (
-        <button className="analyze-btn" onClick={handleAnalyze}>
-          🔍 Analyze
-        </button>
-      )}
+        <div className="news-blocks">
+          {newsSummaries.map((news, idx) => {
+            // Determine recommendation class
+            const recommendationClass =
+              news.traderAdvice?.ifNotInPosition?.toLowerCase().includes('buy') ? 'buy' :
+                news.traderAdvice?.ifNotInPosition?.toLowerCase().includes('hold') ? 'hold' :
+                  news.traderAdvice?.ifNotInPosition?.toLowerCase().includes('sell') ? 'sell' :
+                    '';
 
-      {selectedStock && (
-        <h2 className="news-heading">
-          📰 Analyzing News for: <span>{selectedStock.label}</span>
-          {loading && <span className="spinner" />}
-        </h2>
-      )}
+            return (
+              <div key={idx} className={`news-card ${news.sentiment}`}>
+                <h3>{news.headline}</h3>
+                <p className="news-summary">{news.summary}</p>
 
-      {loading && <div className="loader">⏳ Live analysis in progress...</div>}
+                {news.traderAdvice && (
+                  <div className="trader-advice">
+                    <strong>💡 Trader Advice:</strong>
+                    <ul>
+                      <li><b>If in position:</b> {news.traderAdvice.ifInPosition}</li>
+                      <li><b>If not in position:</b> {news.traderAdvice.ifNotInPosition}</li>
+                    </ul>
+                  </div>
+                )}
 
-      <div className="news-blocks">
-        {newsSummaries.map((news, idx) => {
-          // Determine recommendation class
-          const recommendationClass =
-            news.traderAdvice?.ifNotInPosition?.toLowerCase().includes('buy') ? 'buy' :
-              news.traderAdvice?.ifNotInPosition?.toLowerCase().includes('hold') ? 'hold' :
-                news.traderAdvice?.ifNotInPosition?.toLowerCase().includes('sell') ? 'sell' :
-                  '';
-
-          return (
-            <div key={idx} className={`news-card ${news.sentiment}`}>
-              <h3>{news.headline}</h3>
-              <p className="news-summary">{news.summary}</p>
-
-              {news.traderAdvice && (
-                <div className="trader-advice">
-                  <strong>💡 Trader Advice:</strong>
-                  <ul>
-                    <li><b>If in position:</b> {news.traderAdvice.ifInPosition}</li>
-                    <li><b>If not in position:</b> {news.traderAdvice.ifNotInPosition}</li>
-                  </ul>
+                <div className="news-info-grid">
+                  <div>📌 Impact: {news.impact}</div>
+                  <div>📈 Direction: {news.direction}</div>
+                  <div>⏰ Time: {new Date(news.time).toLocaleString()}</div>
+                  <div>📡 Source: {news.source}</div>
                 </div>
-              )}
 
-              <div className="news-info-grid">
-                <div>📌 Impact: {news.impact}</div>
-                <div>📈 Direction: {news.direction}</div>
-                <div>⏰ Time: {new Date(news.time).toLocaleString()}</div>
-                <div>📡 Source: {news.source}</div>
+                {recommendationClass && (
+                  <div className={`stock-recommendation ${recommendationClass}`}>
+                    <h4>📌 Suggested Action:</h4>
+                    <p>
+                      Based on analysis: <strong>{recommendationClass.toUpperCase()}</strong>
+                    </p>
+                  </div>
+                )}
               </div>
-
-              {recommendationClass && (
-                <div className={`stock-recommendation ${recommendationClass}`}>
-                  <h4>📌 Suggested Action:</h4>
-                  <p>
-                    Based on analysis: <strong>{recommendationClass.toUpperCase()}</strong>
-                  </p>
-                </div>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
+
   );
 };
 
