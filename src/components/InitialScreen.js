@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./InitialScreen.css";
-
 
 const InitialScreen = ({ onContinue }) => {
   const [messages, setMessages] = useState([]);
@@ -10,6 +9,9 @@ const InitialScreen = ({ onContinue }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  // 🔹 Ref for chat area
+  const chatAreaRef = useRef(null);
+
   // 🔹 Load saved messages
   useEffect(() => {
     const stored = localStorage.getItem("messages");
@@ -18,6 +20,13 @@ const InitialScreen = ({ onContinue }) => {
       setShowInitialMessage(false);
     }
   }, []);
+
+  // 🔹 Auto-scroll to bottom whenever messages update
+  useEffect(() => {
+    if (chatAreaRef.current) {
+      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   // 🔹 Handlers
   const handleSidebar = () => setIsMenuOpen((prev) => !prev);
@@ -68,6 +77,7 @@ const InitialScreen = ({ onContinue }) => {
     const starter = [{ id: "1", text: "Hello! How can I help you today?", sender: "AI" }];
     setMessages(starter);
     localStorage.removeItem("messages");
+    if (chatAreaRef.current) chatAreaRef.current.scrollTop = 0; // scroll to top
   };
 
   const handleEditYourAI = () => {
@@ -98,7 +108,7 @@ const InitialScreen = ({ onContinue }) => {
       )}
 
       {/* 🔹 Chat */}
-      <div className="chat-area">
+      <div className="chat-area" ref={chatAreaRef}>
         {showInitialMessage ? (
           <p className="ai-message">Hello! How can I help you today?</p>
         ) : (
