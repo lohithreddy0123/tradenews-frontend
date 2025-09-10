@@ -9,8 +9,7 @@ const InitialScreen = ({ onContinue }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // 🔹 Ref for chat area
-  const chatAreaRef = useRef(null);
+  const chatAreaRef = useRef(null); // 🔹 Reference to chat area for auto-scroll
 
   // 🔹 Load saved messages
   useEffect(() => {
@@ -21,12 +20,12 @@ const InitialScreen = ({ onContinue }) => {
     }
   }, []);
 
-  // 🔹 Auto-scroll to bottom whenever messages update
+  // 🔹 Auto-scroll whenever messages change
   useEffect(() => {
     if (chatAreaRef.current) {
       chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
   // 🔹 Handlers
   const handleSidebar = () => setIsMenuOpen((prev) => !prev);
@@ -47,10 +46,12 @@ const InitialScreen = ({ onContinue }) => {
     localStorage.setItem("messages", JSON.stringify(updated));
 
     // Send to backend
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
     const payload = { message: input, role: "Friend", character: "Funny" };
     setIsLoading(true);
+
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/chat/", {
+      const res = await fetch(`${BACKEND_URL}/api/chat/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -77,7 +78,6 @@ const InitialScreen = ({ onContinue }) => {
     const starter = [{ id: "1", text: "Hello! How can I help you today?", sender: "AI" }];
     setMessages(starter);
     localStorage.removeItem("messages");
-    if (chatAreaRef.current) chatAreaRef.current.scrollTop = 0; // scroll to top
   };
 
   const handleEditYourAI = () => {
