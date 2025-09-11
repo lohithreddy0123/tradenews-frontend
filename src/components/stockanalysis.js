@@ -1,43 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+import stockOptions from "../data/stockOptions";
 import "./StockAnalysis.css";
 
 const StockAnalysis = () => {
   const navigate = useNavigate();
-  const [stockSymbol, setStockSymbol] = useState("");
+  const [selectedStock, setSelectedStock] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState("");
+  const wsRef = useRef(null);
 
-  // Dummy analysis function (replace with real API later)
-  const handleAnalyze = () => {
-    if (!stockSymbol.trim()) {
-      alert("Please enter a stock symbol.");
-      return;
-    }
-    setAnalysisResult(`Analysis for ${stockSymbol.toUpperCase()}: Trend is bullish 📈`);
+  // 🔹 WebSocket to send stock symbol for full analysis
+  const startWebSocket = () => {
+    wsRef.current = new WebSocket("ws://127.0.0.1:8000/ws/stock-analysis/");
+
+    wsRef.current.onopen = () => {
+      if (selectedStock) {
+        const symbol = selectedStock.value?.toUpperCase();
+        console.log("Sending stock for analysis:", symbol);
+
+        wsRef.current.send(
+          JSON.stringify({
+            action: "analyze",
+            symbol: symbol,
+            prompt: "Provide full fundamental and technical analysis of this stock.",
+          })
+        );
+      }
+    };
+
+    wsRef.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setAnalysisResult(data.result); // Assuming backend sends { result: "..." }
+      setLoading(false);
+    };
+
+    wsRef.current.onerror = (error) => console.error("WebSocket error:", error);
+    wsRef.current.onclose = () => console.log("WebSocket closed");
   };
 
-  // 🔹 Top-bar navigation handlers (same as InitialScreen)
-  const handleAnalyzeNews = () => navigate("/analyzer");      // StockNewsAnalyzer
-  const handleChat = () => navigate("/");                    // InitialScreen
-  const handleAnalyzeStock = () => navigate("/stock-trends"); // Current page
+  const handleAnalyze = () => {
+    if (!selectedStock) {
+      alert("Please select a stock.");
+      return;
+    }
+    setLoading(true);
+    setAnalysisResult("⏳ Waiting for analysis...");
+    startWebSocket();
+  };
+
+  const handleEndAnalysis = () => {
+    setLoading(false);
+    setAnalysisResult("");
+    if (wsRef.current) wsRef.current.close();
+  };
+
+  // 🔹 Top-bar navigation handlers
+  const handleAnalyzeNews = () => navigate("/analyzer");
+  const handleChat = () => navigate("/");
+  const handleAnalyzeStock = () => navigate("/stock-trends");
 
   return (
     <div className="stock-analysis">
       {/* Top Bar */}
-      {/* 🔹 Top Bar */}
       <div className="top-bar">
         <h1 className="brand-name">News2Trade</h1>
-
         <div className="top-buttons">
-          <button onClick={handleAnalyzeNews}>Analyse News with AI</button>
-          <button onClick={handleChat}>FinAI Assistant</button>
-          <button onClick={handleAnalyzeStock}>Analyze Stock Trends</button>
+          <button onClick={() => navigate("/analyzer")}>Analyse News with AI</button>
+          <button onClick={() => navigate("/")}>FinAI Assistant</button>
+          <button onClick={() => navigate("/stock-trends")}>Analyze Stock Trends</button>
         </div>
-      </div>
-
-      {/* 🔹 Inline CSS */}
-      <style>
-        {`
+        <style>
+          {`
   .top-bar {
     display: flex;
     align-items: center;
@@ -99,26 +134,66 @@ const StockAnalysis = () => {
     }
   }
 `}
-      </style>
-
+        </style>
+      </div>
 
       {/* Analysis Container */}
-      <div className="analysis-container">
-        <h2>Stock Trend Analysis</h2>
-        <input
-          type="text"
-          placeholder="Enter stock symbol (e.g., AAPL)"
-          value={stockSymbol}
-          onChange={(e) => setStockSymbol(e.target.value)}
-        />
-        <button onClick={handleAnalyze}>Analyze</button>
+      <div className="stock-analysis-page">
+        <div className="stock-analysis-container">
+          <h2>Stock Full Analysis</h2>
 
-        {analysisResult && (
-          <div className="analysis-result">
-            <p>{analysisResult}</p>
+          <div className="stock-selector-section">
+            <label>Select Stock:</label>
+            <Select
+              options={[
+                { label: "Stocks", options: stockOptions.stocks },
+                { label: "Crypto", options: stockOptions.crypto },
+                { label: "Indices", options: stockOptions.indices },
+              ]}
+              value={selectedStock}
+              onChange={setSelectedStock}
+              placeholder="Search and select..."
+              isDisabled={loading}
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  backgroundColor: '#111',
+                  borderColor: '#333',
+                  color: '#fff',
+                }),
+                singleValue: (base) => ({ ...base, color: '#fff' }),
+                menu: (base) => ({ ...base, backgroundColor: '#111', color: '#fff' }),
+                option: (base, state) => ({
+                  ...base,
+                  backgroundColor: state.isFocused ? '#ff4d4d' : '#111',
+                  color: state.isFocused ? '#fff' : '#f9fafb',
+                }),
+                input: (base) => ({ ...base, color: '#fff' }),
+                placeholder: (base) => ({ ...base, color: '#bbb' }),
+              }}
+            />
           </div>
-        )}
+
+          <div className="stock-buttons-section">
+            <button onClick={handleAnalyze} disabled={loading}>
+              🔍 Analyze
+            </button>
+            {loading && (
+              <button onClick={handleEndAnalysis} className="end-btn">
+                ❌ End Analysis
+              </button>
+            )}
+          </div>
+
+          {analysisResult && (
+            <div className="stock-analysis-result">
+              <p>{analysisResult}</p>
+            </div>
+          )}
+        </div>
       </div>
+
+
     </div>
   );
 };
