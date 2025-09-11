@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./InitialScreen.css";
+import { useNavigate } from "react-router-dom";
+
 
 const InitialScreen = ({ onContinue }) => {
   const [messages, setMessages] = useState([]);
@@ -9,7 +11,11 @@ const InitialScreen = ({ onContinue }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+
+
   const chatAreaRef = useRef(null); // 🔹 Reference to chat area for auto-scroll
+
+
 
   // 🔹 Load saved messages
   useEffect(() => {
@@ -27,9 +33,23 @@ const InitialScreen = ({ onContinue }) => {
     }
   }, [messages, isLoading]);
 
-  // 🔹 Handlers
-  const handleSidebar = () => setIsMenuOpen((prev) => !prev);
-  const handleExitSidebar = () => setIsMenuOpen(false);
+
+  const navigate = useNavigate();
+
+  // 🔹 Handlers for top bar navigation
+  const handleAnalyzeNews = () => {
+    navigate("/analyzer"); // StockNewsAnalyzer page
+  };
+
+  const handleChat = () => {
+    navigate("/"); // Current InitialScreen page or your chat page
+  };
+
+  const handleAnalyzeStock = () => {
+    navigate("/stock-trends"); // StockAnalysis page
+  };
+
+
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -89,23 +109,82 @@ const InitialScreen = ({ onContinue }) => {
     <div className="initial-screen">
       {/* 🔹 Top Bar */}
       <div className="top-bar">
-        <button onClick={handleSidebar} className="menu-btn">☰</button>
-        <h1 className="brand-name">MyAI</h1>
-        <button className="getplus-btn" onClick={onContinue}>Getplus</button>
+        <h1 className="brand-name">News2Trade</h1>
+
+        <div className="top-buttons">
+          <button onClick={handleAnalyzeNews}>Analyse News with AI</button>
+          <button onClick={handleChat}>FinAI Assistant</button>
+          <button onClick={handleAnalyzeStock}>Analyze Stock Trends</button>
+        </div>
       </div>
 
-      {/* 🔹 Sidebar */}
-      {isMenuOpen && (
-        <>
-          <div className="sidebar-overlay" onClick={handleExitSidebar}></div>
-          <div className="sidebar">
-            <h2>MyAI</h2>
-            <button onClick={handleEditYourAI}>Edit Your AI</button>
-            <button>Help</button>
-            <button onClick={handleClearChat}>Clear Chat</button>
-          </div>
-        </>
-      )}
+      {/* 🔹 Inline CSS */}
+      <style>
+        {`
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 05px 30px;
+    background: linear-gradient(90deg, #0a0f1a, #313843ff, #444e62ff); /* subtle dark gradient for stock theme */
+    box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .brand-name {
+    font-size: 50px; /* increased size */
+    font-weight: 900;
+    background: linear-gradient(90deg, #ff6f3c, #ff3e3e); /* warm gradient to stand out */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.8); /* glow for prominence */
+  }
+
+  .top-buttons {
+    display: flex;
+    gap: 20px;
+  }
+
+  .top-buttons button {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #1e293b, #111827); /* muted dark gradient */
+    color: #f9fafb; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  }
+
+  .top-buttons button:hover {
+    background: linear-gradient(135deg, #374151, #1f2937); /* subtle hover */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+  }
+
+  @media (max-width: 768px) {
+    .top-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px 20px;
+    }
+    .top-buttons {
+      margin-top: 14px;
+      width: 100%;
+      justify-content: space-between;
+    }
+    .top-buttons button {
+      flex: 1;
+      text-align: center;
+    }
+  }
+`}
+      </style>
+
+
 
       {/* 🔹 Chat */}
       <div className="chat-area" ref={chatAreaRef}>

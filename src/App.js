@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import StockNewsAnalyzer from "./components/StockSelector.js";
+import StockAnalysis from "./components/stockanalysis.js"; // ✅ new import
 import InitialScreen from "./components/InitialScreen.js";
 import "./App.css";
 
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<InitialScreen />} />
           <Route path="/analyzer" element={<StockNewsAnalyzer />} />
+          <Route path="/stock-trends" element={<StockAnalysis />} /> {/* ✅ new route */}
         </Routes>
       </div>
     </Router>
